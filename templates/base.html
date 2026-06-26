@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Retail POS Dashboard{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="dashboard-header">
+    <a class="brand" href="/revenue" aria-label="Retail POS dashboard">
+      <span class="brand-mark">POS</span>
+      <span class="brand-sub">Inventory Dashboard</span>
+    </a>
+    <div class="user-pill">
+        <span>User: {{ current_user.username }}</span>
+        <span>Role: {{ current_user.role }}</span>
+    </div>
+    <nav class="top-nav" aria-label="Dashboard navigation">
+      <a class="nav-button" href="/revenue">Revenue</a>
+      <a class="nav-button" href="/movement">Movement</a>
+      <a class="nav-button" href="/order_placement">Order Placement</a>
+      <a class="nav-button" href="/update">Update</a>
+      <a class="nav-button" href="/audit_log">Audit Log</a>
+      <a class="nav-button" href="/settings">Settings</a>
+    </nav>
+  </header>
+
+  <main class="dashboard-shell">
+    <section class="page-panel">
+      {% block content %}{% endblock %}
+    </section>
+  </main>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

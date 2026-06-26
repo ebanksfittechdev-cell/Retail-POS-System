@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="aud-shell">
+
+  <header class="aud-header">
+    <div>
+      <h1 class="aud-title">Audit Log</h1>
+      <p class="aud-period">Full history of changes and orders</p>
+    </div>
+  </header>
+
+  <div class="aud-controls">
+    <!-- Table toggle -->
+    <div class="aud-toggle" id="tableToggle">
+      <button class="aud-toggle-btn aud-toggle-btn--active" data-table="sku">SKU Changes</button>
+      <button class="aud-toggle-btn" data-table="restock">Order History</button>
+    </div>
+
+    <!-- Change type filter (only visible for SKU table) -->
+    <div id="changeTypeWrap">
+      <select id="changeTypeFilter" class="rev-select">
+        <option value="">All changes</option>
+        <option value="add">Additions</option>
+        <option value="delete">Deletions</option>
+        <option value="update">Updates</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- SKU Changes table -->
+  <div id="skuTableWrap">
+    <table class="rev-table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>SKU</th>
+          <th>Change</th>
+          <th>Detail</th>
+          <th>User</th>
+          <th class="align-right">Timestamp</th>
+        </tr>
+      </thead>
+      <tbody id="skuTableBody">
+        <tr class="skeleton-row"><td colspan="6"><div class="skeleton"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="6"><div class="skeleton"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="6"><div class="skeleton"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Restock / Orders table -->
+  <div id="restockTableWrap" style="display:none;">
+    <table class="rev-table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>SKU</th>
+          <th class="align-right">Qty Added</th>
+          <th>User</th>
+          <th class="align-right">Timestamp</th>
+        </tr>
+      </thead>
+      <tbody id="restockTableBody">
+        <tr class="skeleton-row"><td colspan="5"><div class="skeleton"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="5"><div class="skeleton"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="5"><div class="skeleton"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/audit.js') }}"></script>
+{% endblock %}

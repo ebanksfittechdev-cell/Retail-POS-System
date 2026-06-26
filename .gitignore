@@ -1,0 +1,17 @@
+# Python
+env/
+venv/
+__pycache__/
+*.pyc
+
+# Flask / local DB
+instance/
+*.db
+.env
+
+# Node
+node_modules/
+
+# OS/editor
+.DS_Store
+.vscode/

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POS — Sign In</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+
+  <main class="container">
+
+    <header class="brand">
+      <span class="brand-mark">POS</span>
+      <p class="brand-sub">Point of Sale Inventory System</p>
+    </header>
+
+    <!-- Login Form -->
+    <section class="form-section" id="loginSection">
+      <h1 class="form-title">Sign in</h1>
+
+      <div class="field">
+        <label for="loginUsername">Username</label>
+        <input type="text" id="loginUsername" placeholder="Enter username" autocomplete="username">
+      </div>
+
+      <div class="field">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password">
+      </div>
+
+      <p class="error" id="loginError"></p>
+
+      <button class="btn-primary" id="loginBtn">Sign in</button>
+
+      <p class="toggle-text">
+        Don't have an account?
+        <a href="#" id="showRegister">Make one here</a>
+      </p>
+    </section>
+
+    <!-- Registration Form (hidden by default) -->
+    <section class="form-section hidden" id="registerSection">
+      <h1 class="form-title">Create account</h1>
+
+      <div class="field">
+        <label for="regUsername">Username</label>
+        <input type="text" id="regUsername" placeholder="Choose a username" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label for="regPassword">Password</label>
+        <input type="password" id="regPassword" placeholder="Choose a password" autocomplete="new-password">
+      </div>
+      <!-- Radio Field Form -->
+      <div class="field role-field">
+      <p class="field-label">Which role are you?</p>
+
+      <div class="role-options">
+        <label class="role-option">
+          <input type="radio" name="role" value="Manager">
+          Manager
+        </label>
+
+        <label class="role-option">
+          <input type="radio" name="role" value="Department Manager">
+          Department Manager
+        </label>
+
+        <label class="role-option">
+          <input type="radio" name="role" value="Employee">
+          Employee
+        </label>
+      </div>
+    </div>
+      <p class="error" id="registerError"></p>
+
+      <button class="btn-primary" id="registerBtn">Create account</button>
+
+      <p class="toggle-text">
+        Already have an account?
+        <a href="#" id="showLogin">Sign in</a>
+      </p>
+    </section>
+
+  </main>
+
+  <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</body>
+</html>

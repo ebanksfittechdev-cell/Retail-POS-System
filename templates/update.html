@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="upd-shell">
+
+  <header class="upd-header">
+    <div>
+      <h1 class="upd-title">Manage SKUs</h1>
+      <p class="upd-period">Update, deactivate, or add inventory items</p>
+    </div>
+    <button class="btn-add-sku" id="btnAddSku">+ Add SKU</button>
+  </header>
+
+  <div class="upd-controls">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input
+        type="text"
+        id="searchInput"
+        class="rev-search"
+        placeholder="Search items…"
+        autocomplete="off"
+      />
+    </div>
+    <div class="upd-filters">
+      <select id="departmentFilter" class="rev-select">
+        <option value="">All departments</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="upd-toast" id="updToast"></div>
+
+  <!-- Confirm modal -->
+  <div class="upd-overlay" id="confirmOverlay">
+    <div class="upd-modal">
+      <p class="upd-modal-title">Deactivate item?</p>
+      <p class="upd-modal-body" id="confirmBody">This item will be removed from all active views. This action can only be reversed in the database directly.</p>
+      <div class="upd-modal-actions">
+        <button class="btn-modal-cancel" id="confirmCancel">Cancel</button>
+        <button class="btn-modal-confirm" id="confirmYes">Deactivate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add SKU modal -->
+  <div class="upd-overlay" id="addOverlay">
+    <div class="upd-modal">
+      <p class="upd-modal-title">Add new SKU</p>
+      <div class="upd-modal-form">
+        <div class="modal-field">
+          <label class="modal-label">Item name</label>
+          <input type="text" id="addName" class="modal-input" placeholder="e.g. Frozen Edamame 16oz" />
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Price ($)</label>
+          <input type="number" id="addPrice" class="modal-input" placeholder="0.00" min="0" step="0.01" />
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Initial stock</label>
+          <input type="number" id="addAmount" class="modal-input" placeholder="0" min="0" />
+        </div>
+        <div class="modal-field">
+          <label class="modal-label">Department</label>
+          <div class="radio-group" id="addDeptGroup"></div>
+        </div>
+      </div>
+      <p class="upd-modal-error" id="addError"></p>
+      <div class="upd-modal-actions">
+        <button class="btn-modal-cancel" id="addCancel">Cancel</button>
+        <button class="btn-modal-confirm" id="addSubmit">Add item</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="upd-table-wrap">
+    <table class="rev-table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>SKU</th>
+          <th>Department</th>
+          <th class="align-right">Price</th>
+          <th class="align-right">Stock</th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="updateTableBody">
+        <tr class="skeleton-row"><td colspan="7"><div class="skeleton"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="7"><div class="skeleton"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="7"><div class="skeleton"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/update.js') }}"></script>
+{% endblock %}

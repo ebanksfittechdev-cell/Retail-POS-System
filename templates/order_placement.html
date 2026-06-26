@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="ord-shell">
+
+  <header class="ord-header">
+    <div>
+      <h1 class="ord-title">Orders</h1>
+      <p class="ord-period">Place a shipment order</p>
+    </div>
+  </header>
+
+  <div class="ord-controls">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input
+        type="text"
+        id="searchInput"
+        class="rev-search"
+        placeholder="Search items…"
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="ord-filters">
+      <select id="departmentFilter" class="rev-select">
+        <option value="">All departments</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="ord-toast" id="ordToast"></div>
+
+  <div class="ord-table-wrap">
+    <table class="rev-table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>SKU</th>
+          <th>Department</th>
+          <th class="align-right">Price</th>
+          <th class="align-right">Stock</th>
+          <th class="align-right">Qty</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="orderTableBody">
+        <tr class="skeleton-row"><td colspan="7"><div class="skeleton"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="7"><div class="skeleton"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="7"><div class="skeleton"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ord-pending-panel" id="ordPendingPanel" style="display:none;">
+    <p class="ord-pending-title">Pending shipments</p>
+    <div id="ordPendingList"></div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/order_placement.js') }}"></script>
+{% endblock %}

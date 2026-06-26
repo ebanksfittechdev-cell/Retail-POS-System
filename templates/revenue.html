@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="rev-shell">
+
+  <header class="rev-header">
+    <div>
+      <h1 class="rev-title">Revenue</h1>
+      <p class="rev-period">Last 30 days</p>
+    </div>
+    <div class="rev-header-right">
+      <button class="btn-simulate" id="simulateBtn">Simulate Sale</button>
+    </div>
+  </header>
+
+  <div class="rev-controls">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input
+        type="text"
+        id="searchInput"
+        class="rev-search"
+        placeholder="Search items…"
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="rev-filters">
+      <select id="departmentFilter" class="rev-select">
+        <option value="">All departments</option>
+      </select>
+
+      <div class="sort-toggle" id="sortToggle" data-sort="desc">
+        <span class="sort-label">Highest first</span>
+        <svg class="sort-arrow" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 2v8M3 7l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="rev-summary" id="revSummary">
+    <div class="summary-card">
+      <span class="summary-label">Total revenue</span>
+      <span class="summary-value" id="totalRevenue">—</span>
+    </div>
+    <div class="summary-card">
+      <span class="summary-label">Top item</span>
+      <span class="summary-value" id="topItem">—</span>
+    </div>
+    <div class="summary-card">
+      <span class="summary-label">Items tracked</span>
+      <span class="summary-value" id="itemCount">—</span>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-header">
+      <span class="chart-title">Revenue by item</span>
+      <span class="chart-subtitle" id="chartSubtitle"></span>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="revenueChart"></canvas>
+      <div class="chart-empty" id="chartEmpty">No data matches your filters.</div>
+    </div>
+  </div>
+
+  <div class="rev-table-wrap">
+    <table class="rev-table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Department</th>
+          <th class="align-right">Revenue</th>
+        </tr>
+      </thead>
+      <tbody id="revenueTableBody">
+        <tr class="skeleton-row"><td colspan="3"><div class="skeleton"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="3"><div class="skeleton"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="3"><div class="skeleton"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/revenue.js') }}"></script>
+{% endblock %}

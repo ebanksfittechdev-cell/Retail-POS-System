@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mov-shell">
+
+  <header class="mov-header">
+    <div>
+      <h1 class="mov-title">Movement</h1>
+      <p class="mov-period">Current inventory levels</p>
+    </div>
+  </header>
+
+  <div class="mov-controls">
+    <div class="mov-filters">
+      <select id="departmentFilter" class="rev-select">
+        <option value="">All departments</option>
+      </select>
+
+      <div class="sort-toggle" id="sortToggle" data-sort="asc">
+        <span class="sort-label">Lowest first</span>
+        <svg class="sort-arrow" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 2v8M3 7l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="mov-summary">
+    <div class="summary-card">
+      <span class="summary-label">Total units</span>
+      <span class="summary-value" id="totalUnits">—</span>
+    </div>
+    <div class="summary-card">
+      <span class="summary-label">Low stock items</span>
+      <span class="summary-value" id="lowStockCount">—</span>
+    </div>
+    <div class="summary-card">
+      <span class="summary-label">Items tracked</span>
+      <span class="summary-value" id="itemCount">—</span>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-header">
+      <span class="chart-title">Stock levels by item</span>
+      <span class="chart-subtitle" id="chartSubtitle">All departments</span>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="movementChart"></canvas>
+      <div class="chart-empty" id="chartEmpty">No data matches your filters.</div>
+    </div>
+  </div>
+
+  <div class="rev-table-wrap">
+    <table class="rev-table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>SKU</th>
+          <th>Department</th>
+          <th class="align-right">Stock</th>
+          <th class="align-right">Status</th>
+        </tr>
+      </thead>
+      <tbody id="movementTableBody">
+        <tr class="skeleton-row"><td colspan="5"><div class="skeleton"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="5"><div class="skeleton"></div></td></tr>
+        <tr class="skeleton-row"><td colspan="5"><div class="skeleton"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/movement.js') }}"></script>
+{% endblock %}
