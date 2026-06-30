@@ -1,5 +1,7 @@
-from models import Inventory, Department, Sales
+from models import Inventory, Department, Sales, User
 from extensions import db
+from werkzeug.security import generate_password_hash
+from apscheduler.schedulers.background import BackgroundScheduler
 import random
 
 def seed_inventory():
@@ -104,7 +106,13 @@ def seed_inventory():
 
     
 def simulate_sale():
-        items = Inventory.query.all()
+        items = Inventory.query.filter(
+            Inventory.is_active == True,
+            Inventory.amount > 0
+        ).all()
+
+        if not items:
+            return
 
         item = random.choices(
         items,
@@ -123,3 +131,26 @@ def simulate_sale():
         db.session.add(sale)
         item.amount -= quantity
         db.session.commit()
+
+
+
+def seed_demo_users():
+    demo_users = [
+        ("employee_demo", "Employee"),
+        ("dept_manager_demo", "Department Manager"),
+        ("manager_demo", "Manager"),
+    ]
+
+    for username, role in demo_users:
+        existing = User.query.filter_by(username=username).first()
+        if not existing:
+            db.session.add(User(
+                username=username,
+                password_hash=generate_password_hash("demo123"),
+                role=role
+            ))
+
+    db.session.commit()
+
+
+

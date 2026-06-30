@@ -1,3 +1,4 @@
+import os
 from flask import Blueprint, jsonify, send_from_directory, render_template, request, abort, redirect, flash, url_for, current_app 
 from models import db, User, Inventory, Sales, Restock, Department, SkuChange
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -5,12 +6,17 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, cur
 import random
 from sale_sim import simulate_sale
 from datetime import datetime, timedelta
+from extensions import limiter
 from threading import Thread
 import time 
 
 # Create a Blueprint for routes
 main_routes = Blueprint("main_routes", __name__)
 ALLOWED_ROLES = {"Manager", "Department Manager", "Employee"}
+MAX_ORDER_QUANTITY = 500
+MAX_STOCK_AMOUNT = 500
+MAX_PRICE = 999.99
+MAX_SKU_COUNT = 100
 
 @main_routes.errorhandler(403)
 def forbidden(e):
@@ -79,6 +85,10 @@ def audit_log():
 # register route
 @main_routes.post("/api/register")
 def register():
+
+    if os.environ.get("ALLOW_REGISTRATION", "false").lower() != "true":
+        return jsonify({"message": "Registration is disabled for this demo"}), 403
+    
     data = request.get_json()
 
     username = data.get("username")
@@ -110,6 +120,7 @@ def register():
 
 #login route
 @main_routes.post('/api/login')
+@limiter.limit("10 per hour")
 def api_login():
     data = request.get_json()
 
@@ -141,6 +152,7 @@ def api_login():
 #settings routes
 
 @main_routes.route("/api/logout", methods=["POST"])
+@limiter.limit("10 per minute")
 @login_required
 def api_logout():
     logout_user()
@@ -150,6 +162,9 @@ def api_logout():
 @main_routes.route("/api/delete_account", methods=["DELETE"])
 @login_required
 def api_delete_account():
+    if os.environ.get("ALLOW_REGISTRATION", "false").lower() != "true":
+        return jsonify({"message": "Registration is disabled for this demo"}), 403
+    
     try:
         user = User.query.get(current_user.id)
         if user is None:
@@ -218,6 +233,7 @@ def api_revenue():
 
 #simulates sale through repeated clicks
 @main_routes.route("/api/simulate", methods=["POST"])
+@limiter.limit("50 per hour")
 @login_required
 def simulate():
     simulate_sale()
@@ -273,12 +289,14 @@ def api_movement():
 # order route — add to your main_routes blueprint
 
 @main_routes.route("/api/place_order", methods=["POST"])
-@login_required
+@limiter.limit("10 per minute")
+@role_required("Department Manager", "Manager")
 def place_order():
     data = request.get_json()
 
     item_id  = data.get("item_id")
     quantity = data.get("quantity")
+    
 
     if not item_id or not quantity:
         return jsonify({"status": "error", "message": "item_id and quantity are required"}), 400
@@ -287,6 +305,10 @@ def place_order():
         quantity = int(quantity)
         if quantity <= 0:
             raise ValueError
+        if quantity > MAX_ORDER_QUANTITY:
+            return jsonify({"status": "error", "message": "Quantity is too large"}), 400
+        
+   
     except (ValueError, TypeError):
         return jsonify({"status": "error", "message": "Quantity must be a positive integer"}), 400
 
@@ -294,8 +316,14 @@ def place_order():
     if not item:
         return jsonify({"status": "error", "message": "Item not found"}), 404
 
-    # Update stock immediately
+    
+    if item.amount + quantity > MAX_STOCK_AMOUNT:
+        return jsonify({"status": "error", "message": "Stock amount is too large"}), 400
+
+    
     item.amount += quantity
+
+
 
     # Log restock
     restock = Restock(
@@ -303,7 +331,8 @@ def place_order():
         quantity_added=quantity,
         requested_by=current_user.id
     )
-
+    
+    
     db.session.add(restock)
     db.session.commit()
 
@@ -329,7 +358,8 @@ DEPT_PREFIXES = {
 
 
 @main_routes.route("/api/update_sku", methods=["POST"])
-@login_required
+@limiter.limit("10 per minute")
+@role_required("Manager")
 def update_sku():
     data = request.get_json()
 
@@ -337,6 +367,7 @@ def update_sku():
     item_name = data.get("item_name")
     price     = data.get("price")
     amount    = data.get("amount")
+
 
     if not item_id:
         return jsonify({"status": "error", "message": "item_id is required"}), 400
@@ -346,7 +377,7 @@ def update_sku():
         return jsonify({"status": "error", "message": "Item not found"}), 404
 
     changes = []
-
+    
     if item_name is not None:
         item_name = str(item_name).strip()
         if not item_name:
@@ -362,6 +393,8 @@ def update_sku():
                 raise ValueError
         except (ValueError, TypeError):
             return jsonify({"status": "error", "message": "Price must be a positive number"}), 400
+        if price > MAX_PRICE:
+            return jsonify({"status": "error", "message": "Price is too large"}), 400
         if price != item.price:
             changes.append(f"price: {item.price} -> {price}")
         item.price = price
@@ -373,6 +406,9 @@ def update_sku():
                 raise ValueError
         except (ValueError, TypeError):
             return jsonify({"status": "error", "message": "Stock must be a non-negative integer"}), 400
+        if amount > MAX_STOCK_AMOUNT:
+            return jsonify({"status": "error", "message": "Stock amount is too large"}), 400
+    
         if amount != item.amount:
             changes.append(f"stock: {item.amount} -> {amount}")
         item.amount = amount
@@ -398,7 +434,8 @@ def update_sku():
 
 
 @main_routes.route("/api/deactivate_sku", methods=["POST"])
-@login_required
+@limiter.limit("5 per minute")
+@role_required("Manager")
 def deactivate_sku():
     data = request.get_json()
 
@@ -427,7 +464,8 @@ def deactivate_sku():
 
 
 @main_routes.route("/api/add_sku", methods=["POST"])
-@login_required
+@limiter.limit("5 per minute")
+@role_required("Manager")
 def add_sku():
     """Add a new SKU. Backend auto-generates the item_id from the department prefix."""
     data = request.get_json()
@@ -437,6 +475,8 @@ def add_sku():
     amount     = data.get("amount")
     dept_name  = data.get("department", "").strip()
 
+    if Inventory.query.filter_by(is_active=True).count() >= MAX_SKU_COUNT:
+        return jsonify({"status": "error", "message": "SKU limit reached"}), 400
     # Validate required fields
     if not item_name:
         return jsonify({"status": "error", "message": "Item name is required"}), 400
@@ -447,6 +487,8 @@ def add_sku():
         price = float(price)
         if price < 0:
             raise ValueError
+        if price > MAX_PRICE:
+            return jsonify({"status": "error", "message": "Price is too large"}), 400
     except (ValueError, TypeError):
         return jsonify({"status": "error", "message": "Price must be a positive number"}), 400
 
@@ -454,6 +496,8 @@ def add_sku():
         amount = int(amount)
         if amount < 0:
             raise ValueError
+        if amount > MAX_STOCK_AMOUNT:
+            return jsonify({"status": "error", "message": "Stock amount is too large"}), 400
     except (ValueError, TypeError):
         return jsonify({"status": "error", "message": "Quantity must be a non-negative integer"}), 400
 
